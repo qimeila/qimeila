@@ -3,12 +3,8 @@
 - 🌱 I’m currently learning java/go
 - 📫 How to reach me blog([中文](https://qimeila.gitee.io/))|Email：972845673@qq.com
 <div align="center">
-<span>  </span>
-<img height="170px" src="https://github-readme-stats.vercel.app/api?username=qimeila" /><span>  </span><img height="170px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=qimeila&layout=compact&langs_count=8" />
-<span>  </span>
-</div>
-<div align="center">
-    <img  src="https://github-readme-streak-stats.herokuapp.com/?user=qimeila" />
+  <img height="137px" src="https://github-readme-stats.vercel.app/api?username=qimeila&theme=blue" />
+  <img height="137px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=qimeila&theme=blue" />
 </div>
 <div align="center">
     <img src="https://activity-graph.herokuapp.com/graph?username=qimeila&theme=minimal" />
