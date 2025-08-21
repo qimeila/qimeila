@@ -1,107 +1,97 @@
-{
-  "data": [
-    {
-      "block_number": 75042404,
-      "block_timestamp": 1755786447000,
-      "caller_contract_address": "TU2MJ5Veik1LRAgjeSzEdvmDYx7mefJZvd",
-      "contract_address": "TU2MJ5Veik1LRAgjeSzEdvmDYx7mefJZvd",
-      "event_index": 3,
-      "event_name": "RentResource",
-      "result": {
-        "addedAmount": "250803525760",
-        "amount": "4263171042663",
-        "receiver": "0xb957324d0b580322ed505f54e970d0a91f8f91a3",
-        "securityDeposit": "6523334206",
-        "renter": "0x42576c6bd5e6ea3eb85f823e159e766273bfe408",
-        "0": "0x42576c6bd5e6ea3eb85f823e159e766273bfe408",
-        "1": "0xb957324d0b580322ed505f54e970d0a91f8f91a3",
-        "2": "250803525760",
-        "3": "1",
-        "4": "400000000",
-        "5": "4263171042663",
-        "6": "6523334206",
-        "7": "852199646966458074",
-        "addedSecurityDeposit": "400000000",
-        "rentIndex": "852199646966458074",
-        "resourceType": "1"
-      },
-      "result_type": {
-        "addedAmount": "uint256",
-        "amount": "uint256",
-        "receiver": "address",
-        "securityDeposit": "uint256",
-        "renter": "address",
-        "addedSecurityDeposit": "uint256",
-        "rentIndex": "uint256",
-        "resourceType": "uint256"
-      },
-      "event": "RentResource(address indexed renter, address indexed receiver, uint256 addedAmount, uint256 resourceType, uint256 addedSecurityDeposit, uint256 amount, uint256 securityDeposit, uint256 rentIndex)",
-      "transaction_id": "97a9272ab4c993fa779e74fa32326099dbec0a06aff39010d30b6d75240c27e7",
-      "_unconfirmed": true
-    },
-    {
-      "block_number": 75042404,
-      "block_timestamp": 1755786447000,
-      "caller_contract_address": "TU2MJ5Veik1LRAgjeSzEdvmDYx7mefJZvd",
-      "contract_address": "TU2MJ5Veik1LRAgjeSzEdvmDYx7mefJZvd",
-      "event_index": 2,
-      "event_name": "ResourceRented",
-      "result": {
-        "0": "0x42576c6bd5e6ea3eb85f823e159e766273bfe408",
-        "1": "0xb957324d0b580322ed505f54e970d0a91f8f91a3",
-        "resourceReceiver": "0xb957324d0b580322ed505f54e970d0a91f8f91a3",
-        "2": "1",
-        "3": "250803525760",
-        "resourceRenter": "0x42576c6bd5e6ea3eb85f823e159e766273bfe408",
-        "resourceAmount": "250803525760",
-        "resourceType": "1"
-      },
-      "result_type": {
-        "resourceReceiver": "address",
-        "resourceRenter": "address",
-        "resourceAmount": "uint256",
-        "resourceType": "uint256"
-      },
-      "event": "ResourceRented(address indexed resourceRenter, address indexed resourceReceiver, uint256 indexed resourceType, uint256 resourceAmount)",
-      "transaction_id": "97a9272ab4c993fa779e74fa32326099dbec0a06aff39010d30b6d75240c27e7",
-      "_unconfirmed": true
-    },
-    {
-      "block_number": 75042404,
-      "block_timestamp": 1755786447000,
-      "caller_contract_address": "TU2MJ5Veik1LRAgjeSzEdvmDYx7mefJZvd",
-      "contract_address": "TU2MJ5Veik1LRAgjeSzEdvmDYx7mefJZvd",
-      "event_index": 1,
-      "event_name": "OrderIndex",
-      "result": {
-        "prevIndex": "852197710898628738",
-        "amount": "4012367516903",
-        "receiver": "0xb957324d0b580322ed505f54e970d0a91f8f91a3",
-        "renter": "0x42576c6bd5e6ea3eb85f823e159e766273bfe408",
-        "newIndex": "852199646966458074",
-        "rental": "7768216",
-        "0": "0x42576c6bd5e6ea3eb85f823e159e766273bfe408",
-        "1": "0xb957324d0b580322ed505f54e970d0a91f8f91a3",
-        "2": "1",
-        "badDebt": "0",
-        "3": "852197710898628738",
-        "4": "852199646966458074",
-        "5": "4012367516903",
-        "6": "7768216",
-        "7": "0",
-        "resourceType": "1"
-      },
-      "result_type": {
-        "prevIndex": "uint256",
-        "amount": "uint256",
-        "badDebt": "uint256",
-        "receiver": "address",
-        "renter": "address",
-        "newIndex": "uint256",
-        "resourceType": "uint256",
-        "rental": "uint256"
-      },
-      "event": "OrderIndex(address indexed renter, address indexed receiver, uint256 indexed resourceType, uint256 prevIndex, uint256 newIndex, uint256 amount, uint256 rental, uint256 badDebt)",
-      "transaction_id": "97a9272ab4c993fa779e74fa32326099dbec0a06aff39010d30b6d75240c27e7",
-      "_unconfirmed": true
-    },
+const TronWeb = require('tronweb');
+const { config, validateConfig } = require('./config/config');
+const { MarketContract } = require('./contracts/market-contract');
+const { EventListener } = require('./services/event-listener');
+const { logInfo, logError } = require('./utils/logger');
+
+async function main() {
+  try {
+    console.log('🚀 Starting STRX Protocol Liquidate Monitor...\n');
+    
+    // 验证配置
+    logInfo('Validating configuration...');
+    validateConfig();
+    logInfo('Configuration validation passed');
+    
+    // 初始化TronWeb
+    logInfo('Initializing TronWeb...');
+    const tronWeb = new TronWeb({
+      fullHost: config.tron.rpcUrl,
+      headers: { "TRON-PRO-API-KEY": config.tron.apiKey }
+    });
+    
+    // 测试连接
+    try {
+      const currentBlock = await tronWeb.trx.getCurrentBlock();
+      logInfo(`Connected to TRON network. Current block: ${currentBlock.block_header?.raw_data?.number || 'unknown'}`);
+    } catch (error) {
+      logError('Failed to connect to TRON network', error);
+      throw error;
+    }
+    
+    // 初始化Market合约
+    logInfo('Initializing Market Contract...');
+    const marketContract = new MarketContract(tronWeb, config.contracts.market);
+    logInfo(`Market contract initialized at: ${config.contracts.market}`);
+    
+    // 初始化事件监听器
+    logInfo('Initializing Event Listener...');
+    const eventListener = new EventListener(tronWeb, marketContract, config);
+    
+    // 注册事件处理器
+    eventListener.on('RentResource', (event) => {
+      logInfo('RentResource event received', { event });
+    });
+    
+    eventListener.on('ReturnResource', (event) => {
+      logInfo('ReturnResource event received', { event });
+    });
+    
+    eventListener.on('Liquidate', (event) => {
+      logInfo('Liquidate event received', { event });
+    });
+    
+    // 启动事件监听器
+    logInfo('Starting event listener...');
+    await eventListener.start();
+    
+    // 保持进程运行
+    logInfo('Event listener started successfully. Monitoring for events...\n');
+    
+    // 处理优雅关闭
+    process.on('SIGINT', async () => {
+      logInfo('Received SIGINT, shutting down gracefully...');
+      eventListener.stop();
+      process.exit(0);
+    });
+    
+    process.on('SIGTERM', async () => {
+      logInfo('Received SIGTERM, shutting down gracefully...');
+      eventListener.stop();
+      process.exit(0);
+    });
+    
+    // 处理未捕获的异常
+    process.on('uncaughtException', (error) => {
+      logError('Uncaught exception', error);
+      process.exit(1);
+    });
+    
+    process.on('unhandledRejection', (reason, promise) => {
+      logError('Unhandled rejection at', { promise, reason });
+      process.exit(1);
+    });
+    
+  } catch (error) {
+    logError('Failed to start application', error);
+    process.exit(1);
+  }
+}
+
+// 启动应用
+if (require.main === module) {
+  main().catch((error) => {
+    logError('Application failed to start', error);
+    process.exit(1);
+  });
+} 
